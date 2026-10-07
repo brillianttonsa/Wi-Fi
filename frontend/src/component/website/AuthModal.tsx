@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 import type { AuthMode } from "../types";
-import { Icon, Logo, Modal } from "../shared";
-import { ForgotPassword } from "./ForgotPassword";
+import { Logo, Modal } from "../shared";
 import { Login } from "./Login";
 import { Register } from "./Register";
-import { ResetPassword } from "./ResetPassword";
 
 type AuthModalProps = {
   mode: AuthMode;
@@ -14,44 +12,37 @@ type AuthModalProps = {
 };
 
 export function AuthModal({ mode, onModeChange, onClose, onAuthenticated }: AuthModalProps) {
-  const [resetComplete, setResetComplete] = useState(false);
+  const { login, register } = useAuth();
 
   return (
     <Modal title="Wi-Fi account" onClose={onClose}>
       <div className="mb-7 pr-10">
         <Logo />
       </div>
-      {resetComplete ? (
-        <div className="py-5 text-center">
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#e4f5eb] text-[#20835b]"><Icon name="check" size={26} /></span>
-          <h2 className="mt-5 text-2xl font-extrabold tracking-[-0.05em]">Password updated</h2>
-          <p className="mt-2 text-sm text-[#586c67]">You can now log in with your new password.</p>
-          <button type="button" onClick={() => { setResetComplete(false); onModeChange("login"); }} className="mt-6 font-bold text-[#fa6b37]">Return to log in</button>
-        </div>
-      ) : (
-        <>
-          {mode === "login" && (
-            <Login
-              onSuccess={onAuthenticated}
-              onRegister={() => onModeChange("register")}
-              onForgotPassword={() => onModeChange("forgot")}
-            />
-          )}
-          {mode === "register" && (
-            <Register onSuccess={onAuthenticated} onLogin={() => onModeChange("login")} />
-          )}
-          {mode === "forgot" && (
-            <ForgotPassword onContinue={() => onModeChange("reset")} onBack={() => onModeChange("login")} />
-          )}
-          {mode === "reset" && (
-            <ResetPassword
-              onSuccess={() => setResetComplete(true)}
-              onBack={() => onModeChange("login")}
-            />
-          )}
-        </>
+      {mode === "login" && (
+        <Login
+          onLogin={async (phone, password) => { await login(phone, password); onAuthenticated(); }}
+          onRegister={() => onModeChange("register")}
+          onForgotPassword={() => onModeChange("forgot")}
+        />
       )}
-     
+      {mode === "register" && (
+        <Register
+          onRegister={async (data) => { await register(data); onAuthenticated(); }}
+          onLogin={() => onModeChange("login")}
+        />
+      )}
+      {(mode === "forgot" || mode === "reset") && (
+        <div className="py-4">
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#fa6b37]">Account recovery</span>
+          <h2 className="mt-2 text-[2rem] font-extrabold tracking-[-0.06em] text-[#12201d]">Contact Wi-Fi support</h2>
+          <p className="mt-3 text-[12px] leading-5 text-[#586c67]">
+            Password recovery is not configured on this local server yet. Contact support to regain access.
+          </p>
+          <a href="mailto:hello@wifi.com" className="mt-4 inline-block font-bold text-[#fa6b37]">hello@wifi.com</a>
+          <button type="button" onClick={() => onModeChange("login")} className="mt-5 block text-[11px] font-semibold text-[#66736e]">Back to log in</button>
+        </div>
+      )}
     </Modal>
   );
 }
