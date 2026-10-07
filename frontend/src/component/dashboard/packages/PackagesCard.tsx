@@ -16,6 +16,7 @@ export function PackagesCard({ plan, onChoose }: { plan: PackagePlan; onChoose: 
       <Button onClick={() => onChoose(plan)} className="mt-5 min-h-[38px] w-full text-[10px]">
         Choose package <Icon name="arrow" size={15} />
       </Button>
+      
     </article>
   );
 }
