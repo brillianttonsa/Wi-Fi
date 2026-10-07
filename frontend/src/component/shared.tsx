@@ -80,7 +80,7 @@ export function Logo({ inverse = false }: { inverse?: boolean }) {
       >
         <Icon name="wifi" size={18} />
       </span>
-      Linka
+      Wi-Fi
     </a>
   );
 }
