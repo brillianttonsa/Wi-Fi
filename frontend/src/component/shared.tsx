@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Check,
@@ -7,6 +8,7 @@ import {
   Copy,
   Eye,
   Home,
+  LogOut,
   LockKeyhole,
   Menu,
   Package,
@@ -29,6 +31,7 @@ export type IconName =
   | "eye"
   | "home"
   | "lock"
+  | "logout"
   | "menu"
   | "package"
   | "phone"
@@ -48,6 +51,7 @@ const icons: Record<IconName, LucideIcon> = {
   eye: Eye,
   home: Home,
   lock: LockKeyhole,
+  logout: LogOut,
   menu: Menu,
   package: Package,
   phone: Phone,
@@ -64,10 +68,10 @@ export function Icon({ name, size = 20, className = "" }: { name: IconName; size
   return <IconComponent aria-hidden="true" size={size} strokeWidth={1.8} className={`shrink-0 ${className}`} />;
 }
 
-export function Logo({ inverse = false }: { inverse?: boolean }) {
+export function Logo({ inverse = false, to = "/#top" }: { inverse?: boolean; to?: string }) {
   return (
-    <a
-      href="#top"
+    <Link
+      to={to}
       className={`inline-flex items-center gap-2 text-base font-extrabold tracking-[-0.06em] ${
         inverse ? "text-white" : "text-[#12201d]"
       }`}
@@ -81,7 +85,7 @@ export function Logo({ inverse = false }: { inverse?: boolean }) {
         <Icon name="wifi" size={18} />
       </span>
       Wi-Fi
-    </a>
+    </Link>
   );
 }
 
@@ -126,6 +130,7 @@ type FieldProps = {
   placeholder: string;
   type?: string;
   name?: string;
+  defaultValue?: string;
   required?: boolean;
   autoComplete?: string;
   icon?: IconName;
@@ -136,6 +141,7 @@ export function Field({
   placeholder,
   type = "text",
   name,
+  defaultValue,
   required = false,
   autoComplete,
   icon,
@@ -147,6 +153,7 @@ export function Field({
         {icon && <Icon name={icon} size={17} />}
         <input
           name={name}
+          defaultValue={defaultValue}
           type={type}
           placeholder={placeholder}
           required={required}
