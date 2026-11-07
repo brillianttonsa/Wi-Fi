@@ -1,3 +1,5 @@
+import { apiUrl } from "./config";
+
 export class ApiError extends Error {
   readonly status: number;
 
@@ -14,7 +16,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
     headers.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(path, {
+  const response = await fetch(apiUrl(path), {
     ...init,
     headers,
     credentials: "include",
