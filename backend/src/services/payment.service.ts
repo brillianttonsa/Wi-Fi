@@ -28,6 +28,11 @@ export async function submitPayment(userId: number, planName: string, paymentPho
   const plan = plans.get(planName);
   if (!plan) throw new HttpError(400, "The selected package is not available.");
 
+  const activeConnection = await getActiveConnection(userId);
+  if (activeConnection) {
+    throw new HttpError(409, "You already have an active Wi-Fi package. You can buy a new package after it expires.");
+  }
+
   let phone: string;
   try {
     phone = normalizeTzPhone(paymentPhone);
@@ -117,7 +122,7 @@ export async function handleGatewayWebhook(body: Record<string, unknown>) {
   return (await issueToken(match.id, result.providerTransactionId)) ?? match;
 }
 
-export async function getWifiStatus(userId: number) {
+async function getActiveConnection(userId: number) {
   const now = new Date();
   const [connection] = await db.select().from(payments).where(and(
     eq(payments.userId, userId),
@@ -126,6 +131,12 @@ export async function getWifiStatus(userId: number) {
     gt(payments.expiresAt, now),
   )).orderBy(desc(payments.activatedAt)).limit(1);
 
+  return connection ?? null;
+}
+
+export async function getWifiStatus(userId: number) {
+  const connection = await getActiveConnection(userId);
+
   const [pendingToken] = await db.select().from(payments).where(and(
     eq(payments.userId, userId),
     eq(payments.status, "approved"),
@@ -133,7 +144,7 @@ export async function getWifiStatus(userId: number) {
     isNull(payments.activatedAt),
   )).orderBy(desc(payments.tokenIssuedAt)).limit(1);
 
-  return { connection: connection ?? null, pendingToken: pendingToken ?? null };
+  return { connection, pendingToken: pendingToken ?? null };
 }
 
 export async function activateWifi(userId: number, token: string) {
