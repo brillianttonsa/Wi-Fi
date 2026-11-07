@@ -19,7 +19,7 @@ npm run dev
 
 Vite prints the local development URL when the server starts (usually `http://localhost:5173`).
 
-The development server proxies requests beginning with `/api` to `http://localhost:3001`. Start the backend separately and configure its `CLIENT_ORIGIN` to match the frontend URL. See the backend [README](../backend/README.md) for database and API setup.
+Set `VITE_API_BASE_URL` in `.env` to your backend origin (for example, `http://localhost:3002`). The service layer uses that value directly, so no Vite proxy configuration is required. Start the backend separately and configure its `CLIENT_ORIGIN` to match the frontend URL. See the backend [README](../backend/README.md) for database and API setup.
 
 ## Available scripts
 
@@ -49,6 +49,8 @@ Signed-out visitors who open a dashboard path are redirected to `/`. After authe
 - Dashboard navigation for Home, Packages, and Profile.
 - Profile and password update forms.
 - Package-selection dialog, payment history with seven entries per page, payment status, and Wi-Fi token/status display.
+- Package purchasing is disabled while the customer has an active Wi-Fi session.
+- Persistent light and black themes.
 - Responsive layouts and Tailwind CSS styling.
 
 Payment creation, history, and Wi-Fi features call the corresponding `/api/payments` endpoints. They require the matching payment routes to be implemented and available in the backend.
@@ -72,7 +74,7 @@ src/
 
 ## API and authentication
 
-The shared API client sends browser requests with credentials so the backend's HttpOnly session cookie is included. In local development, Vite forwards `/api` traffic to port `3001`; the frontend does not store the session token itself.
+The shared API client sends browser requests with credentials so the backend's HttpOnly session cookie is included. The API origin comes from `VITE_API_BASE_URL` in `.env`, and the frontend does not store the session token itself.
 
 Authentication endpoints used by the frontend:
 
