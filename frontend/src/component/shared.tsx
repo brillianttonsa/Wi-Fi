@@ -11,10 +11,12 @@ import {
   LogOut,
   LockKeyhole,
   Menu,
+  Moon,
   Package,
   Phone,
   ReceiptText,
   ShieldCheck,
+  Sun,
   UserRound,
   Wifi,
   X,
@@ -33,11 +35,13 @@ export type IconName =
   | "lock"
   | "logout"
   | "menu"
+  | "moon"
   | "package"
   | "phone"
   | "profile"
   | "receipt"
   | "shield"
+  | "sun"
   | "wifi"
   | "x"
   | "zap";
@@ -53,11 +57,13 @@ const icons: Record<IconName, LucideIcon> = {
   lock: LockKeyhole,
   logout: LogOut,
   menu: Menu,
+  moon: Moon,
   package: Package,
   phone: Phone,
   profile: UserRound,
   receipt: ReceiptText,
   shield: ShieldCheck,
+  sun: Sun,
   wifi: Wifi,
   x: X,
   zap: Zap,
