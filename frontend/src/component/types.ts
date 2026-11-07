@@ -42,5 +42,6 @@ export type DashboardOutletContext = {
   getPayment: (reference: string) => Promise<PaymentRecord>;
   connection: WifiConnection | null;
   pendingToken: PendingWifiToken | null;
+  canPurchasePackage: boolean;
   activateWifi: (token: string) => Promise<void>;
 };

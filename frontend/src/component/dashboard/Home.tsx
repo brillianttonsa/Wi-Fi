@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button, Icon } from "../shared";
 import type { PendingWifiToken, WifiConnection } from "../types";
 
@@ -21,12 +21,14 @@ export function Home({
   onViewPackages,
   connection,
   pendingToken,
+  canPurchasePackage,
   onActivate,
   customerName,
 }: {
   onViewPackages: () => void;
   connection: WifiConnection | null;
   pendingToken: PendingWifiToken | null;
+  canPurchasePackage: boolean;
   onActivate: (token: string) => Promise<void>;
   customerName: string;
 }) {
@@ -41,11 +43,7 @@ export function Home({
     return () => window.clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (pendingToken?.token) setTokenInput(pendingToken.token);
-  }, [pendingToken?.token]);
-
-  const remaining = useMemo(() => (connection ? remainingParts(connection.expiresAt) : null), [connection, now]);
+  const remaining = connection ? remainingParts(connection.expiresAt) : null;
   const progress = connection && remaining
     ? Math.min(100, Math.max(8, ((Date.parse(connection.expiresAt) - now) / (Date.parse(connection.expiresAt) - Date.parse(connection.activatedAt))) * 100))
     : 0;
@@ -84,8 +82,8 @@ export function Home({
             {connection ? "Your package is active. Stay connected." : pendingToken ? "Payment confirmed. Enter your token to start Wi-Fi." : "Buy a package, pay from your phone, then activate with your token."}
           </p>
         </div>
-        <Button variant="secondary" onClick={onViewPackages} className="min-h-[42px] text-[11px]">
-          <Icon name="package" size={17} /> Buy a package
+        <Button variant="secondary" disabled={!canPurchasePackage} onClick={onViewPackages} className="min-h-[42px] text-[11px]">
+          <Icon name="package" size={17} /> {canPurchasePackage ? "Buy a package" : "Package active"}
         </Button>
       </div>
 
@@ -158,7 +156,7 @@ export function Home({
         {!connection && (
           <form onSubmit={activate} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto]">
             <input
-              value={tokenInput}
+              value={pendingToken?.token ?? tokenInput}
               onChange={(event) => setTokenInput(event.target.value)}
               placeholder="Enter token to activate Wi-Fi"
               className="h-11 rounded-xl border border-[#dfe5e1] bg-white px-3 font-mono text-[12px] text-[#12201d] outline-none focus:border-[#fa6b37] focus:ring-4 focus:ring-[#fa6b37]/10"
@@ -172,8 +170,8 @@ export function Home({
 
       <div className="mt-8 rounded-[18px] border border-[#d9e5d9] bg-[#edf7f1] p-5">
         <h2 className="text-[15px] font-extrabold text-[#123d33]">Need more Wi-Fi time?</h2>
-        <p className="mt-1 text-[10px] text-[#5d6c66]">Choose a package and approve the mobile money prompt on your phone.</p>
-        <Button onClick={onViewPackages} className="mt-4 min-h-[38px] text-[10px]">View packages <Icon name="arrow" size={15} /></Button>
+        <p className="mt-1 text-[10px] text-[#5d6c66]">{canPurchasePackage ? "Choose a package and approve the mobile money prompt on your phone." : "Your current package must expire before a new payment can be made."}</p>
+        <Button disabled={!canPurchasePackage} onClick={onViewPackages} className="mt-4 min-h-[38px] text-[10px]">{canPurchasePackage ? "View packages" : "Package active"} <Icon name="arrow" size={15} /></Button>
       </div>
     </section>
   );

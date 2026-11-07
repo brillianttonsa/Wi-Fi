@@ -9,20 +9,20 @@ import { PackagesCard } from "./PackagesCard";
 import { PackagesHeader } from "./Header";
 
 export function PackagesPage() {
-  const { payments, addPayment, getPayment } = useOutletContext<DashboardOutletContext>();
+  const { payments, addPayment, getPayment, canPurchasePackage } = useOutletContext<DashboardOutletContext>();
   const [selectedPlan, setSelectedPlan] = useState<PackagePlan | null>(null);
 
   return (
     <>
-      <PackagesHeader />
+      <PackagesHeader canPurchasePackage={canPurchasePackage} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {packages.map((plan) => (
-          <PackagesCard key={plan.name} plan={plan} onChoose={setSelectedPlan} />
+          <PackagesCard key={plan.name} plan={plan} disabled={!canPurchasePackage} onChoose={setSelectedPlan} />
         ))}
       </div>
       <HistoryHeader payments={payments} />
       <PaymentHistoryCard payments={payments} />
-      {selectedPlan && (
+      {selectedPlan && canPurchasePackage && (
         <ChoosePackageModal
           initialPlan={selectedPlan}
           onClose={() => setSelectedPlan(null)}

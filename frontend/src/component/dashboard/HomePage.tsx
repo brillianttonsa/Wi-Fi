@@ -6,13 +6,14 @@ import { Home } from "./Home";
 export function DashboardHomePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { connection, pendingToken, activateWifi } = useOutletContext<DashboardOutletContext>();
+  const { connection, pendingToken, canPurchasePackage, activateWifi } = useOutletContext<DashboardOutletContext>();
 
   return (
     <Home
       customerName={user?.fullName ?? ""}
       connection={connection}
       pendingToken={pendingToken}
+      canPurchasePackage={canPurchasePackage}
       onActivate={activateWifi}
       onViewPackages={() => navigate("/packages")}
     />
