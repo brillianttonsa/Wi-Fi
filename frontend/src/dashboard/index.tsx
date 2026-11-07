@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import { initialPaymentHistory } from "../component/dashboard/Constants";
 import { Sidebar } from "../component/dashboard/Sidebar";
 import { Icon, Logo } from "../component/shared";
+import { ThemeToggle } from "../component/ThemeToggle";
 import type { DashboardOutletContext, PaymentRecord, PendingWifiToken, WifiConnection } from "../component/types";
 import {
   activateWifiRequest,
@@ -62,8 +63,6 @@ export function Dashboard() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  if (!user) return <Navigate to="/" replace />;
-
   const addPayment = useCallback(async (planName: string, phone: string, provider?: string) => {
     const { payment } = await createPaymentRequest(planName, phone, provider);
     const record = toPaymentRecord(payment);
@@ -101,7 +100,17 @@ export function Dashboard() {
     }
   };
 
-  const outletContext: DashboardOutletContext = { payments, addPayment, getPayment, connection, pendingToken, activateWifi };
+  if (!user) return <Navigate to="/" replace />;
+
+  const outletContext: DashboardOutletContext = {
+    payments,
+    addPayment,
+    getPayment,
+    connection,
+    pendingToken,
+    canPurchasePackage: !connection,
+    activateWifi,
+  };
 
   return (
     <div className="min-h-screen bg-[#f7f8f2] lg:flex">
@@ -114,7 +123,9 @@ export function Dashboard() {
             </button>
             <Logo to="/" />
           </div>
-          <div className="relative" ref={menuRef}>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <div className="relative" ref={menuRef}>
             <button
               type="button"
               aria-haspopup="menu"
@@ -141,6 +152,7 @@ export function Dashboard() {
                 </button>
               </div>
             )}
+            </div>
           </div>
         </header>
         {logoutError && <p role="alert" className="bg-[#fbe9e6] px-5 py-2 text-center text-[11px] text-[#c84a3e]">{logoutError}</p>}
